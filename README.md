@@ -10,6 +10,6 @@ Projeto final de POO: Mini-SCADA para simulação e supervisão de uma estação
 | Nível alto | 84% |
 | Pressão alta | 6.4 bar |
 | Falha simulada | Sensor de nível travado por 10 ciclos |
-| Regra extra | Alternância de bombas a cada acionamento |
+| Regra extra | (Nulo) |
 
 
