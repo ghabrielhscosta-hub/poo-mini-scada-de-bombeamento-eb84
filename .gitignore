@@ -216,3 +216,42 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# C++ build
+build/
+bin/
+obj/
+out/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Executáveis e objetos C++
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+
+# Arquivos gerados pelo sistema
+data/*.jsonl
+data/*.csv
+data/*.sqlite
+data/*.db
+
+# Manter a pasta data no repositório
+!data/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
