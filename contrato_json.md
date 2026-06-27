@@ -24,6 +24,7 @@ Cada linha do arquivo representa uma leitura ou evento da estação.
   "unidade": "%",
   "timestamp": "2026-06-27T15:30:00",
   "status": "normal"
+  "qualidade": "valida"
 }
 ```
 ## Exemplo com alarme
@@ -36,9 +37,8 @@ Cada linha do arquivo representa uma leitura ou evento da estação.
   "unidade": "bar",
   "timestamp": "2026-06-27T15:31:00",
   "status": "alarme",
-  "alarmes": [
-    "pressao_alta"
-  ]
+  "alarmes": ["pressao_alta"],
+  "qualidade": "valida"
 }
 ```
 ## Exemplo com comando
