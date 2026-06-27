@@ -12,4 +12,10 @@ Projeto final de POO: Mini-SCADA para simulação e supervisão de uma estação
 | Falha simulada | Sensor de nível travado por 10 ciclos |
 | Regra extra | (Nulo) |
 
+## Divisão de responsabilidades
 
+| Integrante | GitHub | Responsabilidade principal |
+|---|---|---|
+| Integrante A | @Kavanell | Dispositivo C++, sensores, bombas, regras, comandos e testes C++ |
+| Integrante B | @ghabrielhscosta-hub | Supervisor Python/Streamlit, JSON, histórico CSV e testes Python |
+| Ambos | @Kavanell e @ghabrielhscosta-hub | Contrato JSON, README, AI_LOG, integração e defesa |
