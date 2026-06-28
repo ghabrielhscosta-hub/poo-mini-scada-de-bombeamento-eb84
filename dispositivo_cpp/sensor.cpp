@@ -18,24 +18,39 @@ class Leitura {
         vector<string> alarmes;
 };
 
-class Sensor {
+class Sensor{
     protected:
         string tag;
         optional<double> valor;
-        string status = "normal";
-        string tipo = "sensor";
+        string status = "Normal";
+        string tipo = "Sensor";
+        string unidade ="";
 
     public:
-        virtual Leitura ler() = 0;
+
+
+        Sensor(string tag_inicial) : tag(tag_inicial) {}
+
+        virtual Leitura ler()=0;
+
+        const string& getTag() const { return tag; }
+        const string& getStatus() const { return status; }
+        const string& getTipo() const { return tipo; }
+        
 
         virtual ~Sensor() = default;
     
 };
 
 class SensorNivel : public Sensor {
-    protected:
-        string unidade = "%";
-    public:
+        public:
+        SensorNivel() : Sensor("SN-01"){
+            unidade = "%";
+            tipo = "Nivel";       
+        }
+
+        double getValor() const { return valor.value_or(0.0); }
+
         Leitura ler() override {
           Leitura l;
           l.valor = valor.value_or(0.0);
@@ -45,15 +60,23 @@ class SensorNivel : public Sensor {
           l.unidade = unidade;
           return l;
     }
+
+    
 };
 
 class SensorTemperatura : public Sensor {
-    protected:
-        string unidade = u8"\u00B0C";
-    public:
+   public:
+
+        SensorTemperatura() : Sensor("ST-01") {
+            unidade = "°C";
+            tipo = "Temperatura";       
+        }
+
+        double getValor() const { return valor.value_or(10.0); } 
+
         Leitura ler() override {
           Leitura l;
-          l.valor = valor.value_or(0.0);
+          l.valor = valor.value_or(10.0);
           l.tag = tag;
           l.status = status;
           l.tipo = tipo;
@@ -63,12 +86,18 @@ class SensorTemperatura : public Sensor {
 };
 
 class SensorVazao : public Sensor {
-    protected:
-        string unidade = "L/s";
+   
     public:
+         SensorVazao() : Sensor("SV-01") {
+            unidade = "L/s"; 
+            tipo = "Vazao";      
+        }
+
+        double getValor() const { return valor.value_or(1.0); }
+
         Leitura ler() override {
           Leitura l;
-          l.valor = valor.value_or(0.0);
+          l.valor = valor.value_or(1.0);
           l.tag = tag;
           l.status = status;
           l.tipo = tipo;
@@ -78,12 +107,19 @@ class SensorVazao : public Sensor {
 };
 
 class SensorPressao : public Sensor {
-    protected:
-        string unidade = "bar";
     public:
+
+        SensorPressao() : Sensor("SP-01") {
+            unidade = "bar";
+            tipo = "Pressao";
+        }
+
+
+        double getValor() const { return valor.value_or(2.0); }
+
         Leitura ler() override {
           Leitura l;
-          l.valor = valor.value_or(0.0);
+          l.valor = valor.value_or(2.0);
           l.tag = tag;
           l.status = status;
           l.tipo = tipo;
@@ -93,14 +129,3 @@ class SensorPressao : public Sensor {
 
     
 };
-
-
-
-/*
-int () {
-  Sensor* s;
-  SensorNivel sn;
-  s = &sn;
-  s->ler();
-}
-*/
