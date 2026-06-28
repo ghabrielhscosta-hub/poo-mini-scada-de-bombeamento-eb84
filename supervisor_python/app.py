@@ -2,11 +2,13 @@ import pandas as pd
 import streamlit as st
 
 from json_reader import carregar_jsonl
-
+from historico_repository import HistoricoRepository
 
 ESTACAO_ID = "EB-84"
 CAMINHO_JSONL = "data/leituras_exemplo.jsonl"
+CAMINHO_HISTORICO = "data/historico.csv"
 
+historico_repository = HistoricoRepository(CAMINHO_HISTORICO)
 
 st.set_page_config(
     page_title="Mini-SCADA EB-84",
@@ -87,7 +89,40 @@ if registros_invalidos:
 else:
     st.success("Todos os registros do arquivo JSON Lines são válidos.")
 
-st.info(
-    "Nesta etapa, o supervisor já lê e valida um arquivo JSON Lines. "
-    "O histórico CSV será implementado na Issue 10."
-)
+st.subheader("Histórico CSV")
+
+st.write(
+    "O histórico é salvo usando o padrão Repository. "
+    )
+
+if st.button("Salvar registros válidos no histórico"):
+    resultado = historico_repository.salvar_registros(registros_validos)
+
+    total_salvo = (
+        resultado["leituras"]
+        + resultado["alarmes"]
+        + resultado["comandos"]
+    )
+
+    if total_salvo > 0:
+        st.success(
+            f"{total_salvo} novo(s) registro(s) salvo(s): "
+            f"{resultado['leituras']} leitura(s), "
+            f"{resultado['alarmes']} alarme(s), "
+            f"{resultado['comandos']} comando(s)."
+        )
+    else:
+        st.info("Nenhum registro novo foi salvo. Os dados já estavam no histórico.")
+
+historico = historico_repository.carregar_historico()
+
+if historico:
+    df_historico = pd.DataFrame(historico)
+
+    st.write("Histórico salvo:")
+    st.dataframe(
+        df_historico,
+        use_container_width=True
+    )
+else:
+    st.info("O histórico CSV ainda não possui registros.")
