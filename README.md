@@ -65,11 +65,15 @@ Campos obrigatórios usados na comunicação:
 | `timestamp` | Data e hora da leitura ou evento              |
 | `status`    | Estado operacional                            |
 
-## Padrão de projeto utilizado
+## Padrões de projeto utilizados
 
-O padrão de projeto usado no projeto será o **Strategy**, aplicado nas regras de controle do dispositivo em C++.
+O projeto utiliza dois padrões de projeto principais: **Strategy** e **Repository**.
 
-Cada regra de controle será separada da classe principal da estação, permitindo que as regras sejam executadas por uma interface comum.
+### Strategy
+
+O padrão **Strategy** é aplicado nas regras de controle do dispositivo em C++.
+
+Cada regra de controle fica separada da classe principal da estação, permitindo que as regras sejam executadas por uma interface comum.
 
 Exemplos de regras:
 
@@ -78,11 +82,17 @@ Exemplos de regras:
 * regra de pressão alta;
 * regra específica da dupla.
 
+### Repository
+
+O padrão **Repository** é aplicado no supervisor Python para separar a persistência em CSV da interface Streamlit.
+
+A classe `HistoricoRepository` é responsável por salvar leituras, alarmes e comandos no arquivo `data/historico.csv`, além de carregar o histórico salvo. Dessa forma, o arquivo `app.py` não acessa o CSV diretamente.
+
 ## Histórico
 
-O histórico será salvo em arquivos CSV dentro da pasta `data/`.
+O histórico é salvo em arquivo CSV dentro da pasta `data/`.
 
-O supervisor Python será responsável por registrar leituras, comandos e alarmes para consulta posterior.
+O supervisor Python registra leituras, comandos e alarmes para consulta posterior no Streamlit.
 
 ## Uso de IA
 

@@ -116,6 +116,8 @@ Solicitamos ajuda para criar a primeira versão do supervisor Streamlit, com foc
 
 A decisão foi manter a Issue 08 limitada à criação da tela inicial do supervisor. Os dados temporários seguem os campos principais do contrato JSON, mas ainda não representam a leitura real do C++. A leitura do arquivo JSON Lines será feita na Issue 09, o histórico CSV na Issue 10 e os gráficos, alarmes e comandos completos na Issue 11.
 
+---
+
 ## Registro 04 — Leitura e validação de JSON Lines
 
 **Data:** 2026-06-28
@@ -146,3 +148,34 @@ Solicitamos ajuda para fazer o supervisor Python ler e validar um arquivo JSON L
 ### Justificativa técnica
 
 A Issue 09 ficou limitada à leitura e validação do JSON Lines. A validação foi separada em módulos próprios para organizar o código e permitir que o Streamlit trate erros sem quebrar a aplicação.
+
+---
+
+## Registro 05 — Histórico CSV com Repository
+
+**Data:** 2026-06-28
+**Ferramenta:** ChatGPT
+**Issue relacionada:** #10 — Implementar histórico em CSV com Repository
+**Responsável principal:** @ghabrielhscosta-hub
+
+### Pedido feito à IA
+
+Solicitamos ajuda para implementar o histórico em CSV usando o padrão Repository.
+
+### Aceito
+
+* Criação da classe `HistoricoRepository`.
+* Salvamento de leituras, alarmes e comandos no CSV.
+* Consulta do histórico pelo Streamlit.
+* Prevenção de registros duplicados.
+* Separação entre interface e persistência.
+
+### Rejeitado
+
+* Acesso direto ao CSV dentro do `app.py`.
+* Uso de SQLite nesta etapa.
+* Alterações visuais desnecessárias no botão.
+
+### Justificativa técnica
+
+O Repository foi usado para organizar a persistência do histórico. O `app.py` cuida da interface, enquanto o `HistoricoRepository` salva e carrega os dados do CSV.
