@@ -103,3 +103,35 @@ AI_LOG.md
 ```
 
 Esse arquivo registra os pedidos feitos à IA, o que foi aceito, o que foi rejeitado e a justificativa técnica da dupla.
+
+## Testes do supervisor Python
+
+O supervisor Python possui testes automatizados usando `pytest`.
+
+Os testes verificam a leitura e validação dos registros JSON Lines usados pelo supervisor.
+
+Foram testados os seguintes casos:
+
+* registro JSON válido;
+* registro sem campo obrigatório;
+* registro com tipo inválido;
+* arquivo JSON Lines inexistente;
+* linha JSON corrompida.
+
+Para executar os testes, use o comando na raiz do projeto:
+
+```bash
+py -m pytest tests/
+```
+
+Resultado obtido:
+
+```text
+5 passed
+```
+
+Os testes estão no arquivo:
+
+```text
+tests/test_supervisor_python.py
+```
