@@ -9,7 +9,7 @@ As sugestões aceitas foram revisadas pela dupla antes de serem aplicadas no rep
 
 ## Registro 01 — Organização inicial do projeto
 
-**Data:** 2026-XX-XX
+**Data:** 2026-06-27
 **Ferramenta:** ChatGPT
 **Issue relacionada:** #01 — Planejamento inicial e assinatura da dupla
 **Responsáveis:** @Kavanell, @ghabrielhscosta-hub
@@ -40,7 +40,7 @@ A dupla decidiu manter o GitHub focado nas entregas técnicas do projeto: códig
 
 ## Registro 02 — Contrato JSON
 
-**Data:** 2026-XX-XX
+**Data:** 2026-06-27
 **Ferramenta:** ChatGPT
 **Issue relacionada:** #02 — Definir contrato JSON do sistema
 **Responsáveis:** @Kavanell, @ghabrielhscosta-hub
@@ -84,7 +84,7 @@ As alterações foram aceitas para manter consistência entre contrato, README, 
 
 ## Registro 03 — Tela inicial do supervisor Streamlit
 
-**Data:** 2026-XX-XX
+**Data:** 2026-06-27
 **Ferramenta:** ChatGPT
 **Issue relacionada:** #08 — Criar supervisor Streamlit
 **Responsável principal:** @ghabrielhscosta-hub
