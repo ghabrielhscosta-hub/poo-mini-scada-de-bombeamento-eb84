@@ -9,7 +9,7 @@ As sugestões aceitas foram revisadas pela dupla antes de serem aplicadas no rep
 
 ## Registro 01 — Organização inicial do projeto
 
-**Data:** 2026-XX-XX
+**Data:** 2026-06-27
 **Ferramenta:** ChatGPT
 **Issue relacionada:** #01 — Planejamento inicial e assinatura da dupla
 **Responsáveis:** @Kavanell, @ghabrielhscosta-hub
@@ -40,7 +40,7 @@ A dupla decidiu manter o GitHub focado nas entregas técnicas do projeto: códig
 
 ## Registro 02 — Contrato JSON
 
-**Data:** 2026-XX-XX
+**Data:** 2026-06-27
 **Ferramenta:** ChatGPT
 **Issue relacionada:** #02 — Definir contrato JSON do sistema
 **Responsáveis:** @Kavanell, @ghabrielhscosta-hub
@@ -84,7 +84,7 @@ As alterações foram aceitas para manter consistência entre contrato, README, 
 
 ## Registro 03 — Tela inicial do supervisor Streamlit
 
-**Data:** 2026-XX-XX
+**Data:** 2026-06-27
 **Ferramenta:** ChatGPT
 **Issue relacionada:** #08 — Criar supervisor Streamlit
 **Responsável principal:** @ghabrielhscosta-hub
@@ -116,3 +116,33 @@ Solicitamos ajuda para criar a primeira versão do supervisor Streamlit, com foc
 
 A decisão foi manter a Issue 08 limitada à criação da tela inicial do supervisor. Os dados temporários seguem os campos principais do contrato JSON, mas ainda não representam a leitura real do C++. A leitura do arquivo JSON Lines será feita na Issue 09, o histórico CSV na Issue 10 e os gráficos, alarmes e comandos completos na Issue 11.
 
+## Registro 04 — Leitura e validação de JSON Lines
+
+**Data:** 2026-06-28
+**Ferramenta:** ChatGPT
+**Issue relacionada:** #09 — Ler e validar JSON Lines no Python
+**Responsável principal:** @ghabrielhscosta-hub
+
+### Pedido feito à IA
+
+Solicitamos ajuda para fazer o supervisor Python ler e validar um arquivo JSON Lines.
+
+### Aceito
+
+* Criação dos arquivos `validator.py` e `json_reader.py`.
+* Leitura de arquivo `.jsonl`.
+* Validação dos campos obrigatórios: `tag`, `valor`, `unidade`, `timestamp` e `status`.
+* Tratamento de arquivo ausente, JSON inválido e tipo de dado incorreto.
+* Separação entre registros válidos e inválidos.
+* Exibição dos erros no Streamlit.
+* Criação de `data/leituras_exemplo.jsonl`.
+
+### Rejeitado
+
+* Fazer integração completa com o C++ nesta etapa.
+* Implementar histórico CSV, gráficos, comandos e alarmes completos agora.
+* Usar biblioteca externa de validação.
+
+### Justificativa técnica
+
+A Issue 09 ficou limitada à leitura e validação do JSON Lines. A validação foi separada em módulos próprios para organizar o código e permitir que o Streamlit trate erros sem quebrar a aplicação.
