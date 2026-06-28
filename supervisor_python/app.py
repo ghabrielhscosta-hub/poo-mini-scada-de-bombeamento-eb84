@@ -75,6 +75,115 @@ else:
         use_container_width=True
     )
 
+st.subheader("Gráficos históricos")
+
+df_grafico = df_leituras.copy()
+
+if df_grafico.empty:
+    st.info("Não há leituras suficientes para gerar gráficos.")
+else:
+    df_grafico["timestamp"] = pd.to_datetime(
+        df_grafico["timestamp"],
+        errors="coerce"
+    )
+
+    df_grafico["valor"] = pd.to_numeric(
+        df_grafico["valor"],
+        errors="coerce"
+    )
+
+    df_grafico = df_grafico.dropna(subset=["timestamp", "valor"])
+
+    grafico_dados = df_grafico.pivot_table(
+        index="timestamp",
+        columns="tag",
+        values="valor",
+        aggfunc="last"
+    ).sort_index()
+
+    col_grafico1, col_grafico2 = st.columns(2)
+
+    with col_grafico1:
+        st.write("Nível do reservatório")
+
+        if "nivel_reservatorio" in grafico_dados.columns:
+            st.line_chart(grafico_dados[["nivel_reservatorio"]])
+        else:
+            st.info("Não há dados de nível disponíveis.")
+
+    with col_grafico2:
+        st.write("Pressão da linha")
+
+        if "pressao_linha" in grafico_dados.columns:
+            st.line_chart(grafico_dados[["pressao_linha"]])
+        else:
+            st.info("Não há dados de pressão disponíveis.")
+
+
+st.subheader("Alarmes")
+
+alarmes_encontrados = []
+
+for registro in registros_validos:
+    alarmes = registro.get("alarmes", [])
+
+    if not isinstance(alarmes, list):
+        continue
+
+    for alarme in alarmes:
+        alarmes_encontrados.append({
+            "timestamp": registro.get("timestamp", ""),
+            "tag": registro.get("tag", ""),
+            "alarme": alarme,
+            "status": registro.get("status", ""),
+        })
+
+if alarmes_encontrados:
+    df_alarmes = pd.DataFrame(alarmes_encontrados)
+
+    st.dataframe(
+        df_alarmes,
+        use_container_width=True
+    )
+
+    if "sensor_nivel_travado" in df_alarmes["alarme"].values:
+        st.warning("Falha simulada detectada: sensor de nível travado.")
+
+    if "pressao_alta_persistente" in df_alarmes["alarme"].values:
+        st.error("Regra extra acionada: pressão alta por vários ciclos.")
+else:
+    st.success("Nenhum alarme encontrado.")
+
+
+st.subheader("Comandos")
+
+comandos_encontrados = []
+
+for registro in registros_validos:
+    comandos = registro.get("comandos", [])
+
+    if not isinstance(comandos, list):
+        continue
+
+    for comando in comandos:
+        comandos_encontrados.append({
+            "timestamp": registro.get("timestamp", ""),
+            "tag": registro.get("tag", ""),
+            "comando": comando,
+            "status": registro.get("status", ""),
+            "acao": registro.get("acao", ""),
+        })
+
+if comandos_encontrados:
+    df_comandos = pd.DataFrame(comandos_encontrados)
+
+    st.dataframe(
+        df_comandos,
+        use_container_width=True
+    )
+else:
+    st.info("Nenhum comando encontrado.")
+
 st.subheader("Validação do arquivo JSON Lines")
 
 if registros_invalidos:
@@ -91,9 +200,7 @@ else:
 
 st.subheader("Histórico CSV")
 
-st.write(
-    "O histórico é salvo usando o padrão Repository. "
-    )
+st.write("O histórico é salvo usando o padrão Repository.")
 
 if st.button("Salvar registros válidos no histórico"):
     resultado = historico_repository.salvar_registros(registros_validos)
