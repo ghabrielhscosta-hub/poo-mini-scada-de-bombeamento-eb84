@@ -179,3 +179,35 @@ Solicitamos ajuda para implementar o histórico em CSV usando o padrão Reposito
 ### Justificativa técnica
 
 O Repository foi usado para organizar a persistência do histórico. O `app.py` cuida da interface, enquanto o `HistoricoRepository` salva e carrega os dados do CSV.
+
+---
+
+## Registro 06 — Gráficos, alarmes e comandos no Streamlit
+
+**Data:** 2026-06-28
+**Ferramenta:** ChatGPT
+**Issue relacionada:** #11 — Criar gráficos, alarmes e comandos no Streamlit
+**Responsável principal:** @ghabrielhscosta-hub
+
+### Pedido feito à IA
+
+Solicitamos ajuda para complementar o supervisor Streamlit com gráficos históricos, visualização de alarmes, comandos e destaque da regra extra da dupla.
+
+### Aceito
+
+* Criação de gráficos históricos para nível do reservatório e pressão da linha.
+* Exibição de alarmes lidos do JSON Lines.
+* Exibição de comandos lidos do JSON Lines.
+* Destaque para falha simulada do sensor de nível travado.
+* Inclusão do alarme `pressao_alta_persistente` para representar a regra extra da dupla.
+* Atualização do JSONL de exemplo para demonstrar pressão alta por vários ciclos.
+
+### Rejeitado
+
+* Alterar o `json_reader.py`, pois ele já carregava corretamente os registros válidos.
+* Implementar a contagem real dos ciclos no Streamlit, pois essa regra pertence ao dispositivo C++.
+* Mudar o visual geral da interface nesta etapa.
+
+### Justificativa técnica
+
+A Issue 11 ficou concentrada na visualização do supervisor. A leitura e validação dos dados já existiam, então o Streamlit apenas passou a apresentar gráficos, alarmes e comandos a partir dos registros válidos do JSON Lines. A regra extra `pressao_alta_persistente` foi exibida no supervisor, enquanto sua lógica real será implementada no C++.
