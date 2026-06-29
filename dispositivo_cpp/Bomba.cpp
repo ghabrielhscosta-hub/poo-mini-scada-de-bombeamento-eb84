@@ -2,16 +2,31 @@
 
 Bomba::Bomba(const std::string& tagInicial) : tag(tagInicial) {}
 
-void Bomba::ligar() {
+bool Bomba::ligar() {
+    if (estado == EstadoBomba::Bloqueada || estado == EstadoBomba::Falha) {
+        return false;
+    }
+
     estado = EstadoBomba::Ligada;
+    return true;
 }
 
-void Bomba::desligar() {
+bool Bomba::desligar() {
+    if (estado == EstadoBomba::Falha) {
+        return false;
+    }
+
     estado = EstadoBomba::Desligada;
+    return true;
 }
 
-void Bomba::bloquear() {
+bool Bomba::bloquear() {
+    if (estado == EstadoBomba::Falha) {
+        return false;
+    }
+
     estado = EstadoBomba::Bloqueada;
+    return true;
 }
 
 void Bomba::falhar() {
@@ -32,33 +47,14 @@ EstadoBomba Bomba::getEstado() const {
 
 std::string Bomba::estadoComoTexto() const {
     switch (estado) {
-        case EstadoBomba::Desligada:
-            return "desligada";
         case EstadoBomba::Ligada:
             return "ligada";
         case EstadoBomba::Bloqueada:
             return "bloqueada";
         case EstadoBomba::Falha:
             return "falha";
+        case EstadoBomba::Desligada:
         default:
-            return "desconhecido";
+            return "desligada";
     }
-}
-
-std::string Bomba::gerarJsonEstado() const {
-    int valorEstado = 0;
-
-    if (estado == EstadoBomba::Ligada) {
-        valorEstado = 1;
-    }
-
-    return "{"
-           "\"estacao\":\"EB-84\","
-           "\"tipo\":\"bomba\","
-           "\"tag\":\"" + tag + "\","
-           "\"valor\":" + std::to_string(valorEstado) + ","
-           "\"unidade\":\"estado\","
-           "\"status\":\"normal\","
-           "\"acao\":\"" + estadoComoTexto() + "\""
-           "}";
 }
