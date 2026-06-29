@@ -1,47 +1,64 @@
-#include <string>
-#include <vector>
-#include <iostream>
+#include "Bomba.h"
 
-enum class EstadoBomba {
-    Desligada,
-    Ligada,
-    Bloqueada,
-    Falha
-};
+Bomba::Bomba(const std::string& tagInicial) : tag(tagInicial) {}
 
-class Bomba {
-protected:
-    string tag;
-    EstadoBomba estado = EstadoBomba::Desligada;
+void Bomba::ligar() {
+    estado = EstadoBomba::Ligada;
+}
 
-public:
-    Bomba(string tagInicial) : tag(tagInicial) {}
+void Bomba::desligar() {
+    estado = EstadoBomba::Desligada;
+}
 
-    void ligar() {
-        estado = EstadoBomba::Ligada;
+void Bomba::bloquear() {
+    estado = EstadoBomba::Bloqueada;
+}
+
+void Bomba::falhar() {
+    estado = EstadoBomba::Falha;
+}
+
+void Bomba::resetar() {
+    estado = EstadoBomba::Desligada;
+}
+
+const std::string& Bomba::getTag() const {
+    return tag;
+}
+
+EstadoBomba Bomba::getEstado() const {
+    return estado;
+}
+
+std::string Bomba::estadoComoTexto() const {
+    switch (estado) {
+        case EstadoBomba::Desligada:
+            return "desligada";
+        case EstadoBomba::Ligada:
+            return "ligada";
+        case EstadoBomba::Bloqueada:
+            return "bloqueada";
+        case EstadoBomba::Falha:
+            return "falha";
+        default:
+            return "desconhecido";
+    }
+}
+
+std::string Bomba::gerarJsonEstado() const {
+    int valorEstado = 0;
+
+    if (estado == EstadoBomba::Ligada) {
+        valorEstado = 1;
     }
 
-    void desligar() {
-        estado = EstadoBomba::Desligada;
-    }
-
-    void bloquear() {
-        estado = EstadoBomba::Bloqueada;
-    }
-
-    void falhar() {
-        estado = EstadoBomba::Falha;
-    }
-
-    void resetar() {
-        estado = EstadoBomba::Desligada;
-    }
-
-    const string& getTag() const {
-        return tag;
-    }
-
-    EstadoBomba getEstado() const {
-        return estado;
-    }
-};
+    return "{"
+           "\"estacao\":\"EB-84\","
+           "\"tipo\":\"bomba\","
+           "\"tag\":\"" + tag + "\","
+           "\"valor\":" + std::to_string(valorEstado) + ","
+           "\"unidade\":\"estado\","
+           "\"status\":\"normal\","
+           "\"acao\":\"" + estadoComoTexto() + "\""
+           "}";
+}
