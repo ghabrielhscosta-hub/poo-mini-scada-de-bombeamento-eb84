@@ -391,3 +391,24 @@ Foi solicitado apoio para atualizar o README com as informações do projeto e c
 ### Justificativa técnica
 
 A documentação final precisa estar compatível com o código entregue, com as issues e com a defesa técnica. O README e o AI_LOG ajudam a demonstrar organização, autoria, rastreabilidade e entendimento das decisões tomadas no projeto.
+
+---
+
+## Registro 13 — Correção do fluxo principal e integração
+
+**Data:** 2026-06-30  
+**Ferramenta:** ChatGPT  
+**Issue relacionada:** #14 — Testar integração C++ com Python  
+**Responsável:** @Kavanell e @ghabrielhscosta-hub  
+
+**Pedido:**  
+Apoio para corrigir problemas encontrados na integração entre o dispositivo C++ e o supervisor Python/Streamlit.
+
+**Aceito:**  
+Foram aceitas correções na geração e leitura do arquivo `data/leituras_dispositivo.jsonl`, ajuste do caminho usado pelo supervisor, remoção de duplicações no `app.py`, correção dos gráficos históricos para usar dados do `historico.csv`, retirada de `sensor_nivel_travado` da lista de comandos, registro correto da falha como alarme, e prevenção de comandos duplicados no dispositivo C++.
+
+**Rejeitado:**  
+Foi rejeitada a ideia de tratar `sensor_nivel_travado` como comando, pois ele representa uma falha/alarme. Também foi evitado versionar arquivos gerados automaticamente, como executáveis, `historico.csv` e pastas `__pycache__`.
+
+**Justificativa:**  
+As alterações melhoraram a coerência entre o dispositivo C++ e o supervisor Python, mantendo o fluxo principal do projeto: dispositivo gera JSON Lines, supervisor lê o arquivo, exibe leituras, alarmes, comandos e salva histórico via Repository. A correção também deixou os dados mais adequados para apresentação e validação da integração.

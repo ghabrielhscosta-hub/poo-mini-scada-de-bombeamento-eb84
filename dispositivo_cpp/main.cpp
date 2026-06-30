@@ -2,6 +2,7 @@
 #include "EstacaoBombeamento.h"
 #include "JsonWriter.h"
 #include "RegraControle.h"
+#include "CenariosSimulacao.h"
 
 #include <exception>
 #include <iostream>
@@ -10,8 +11,14 @@
 #include <vector>
 
 namespace {
-std::string statusSensor(double nivel, double pressao) {
-    if (nivel < 24.0 || nivel > 84.0 || pressao > 6.4) {
+std::string statusSensor(const LeituraEstacao& leitura) {
+    if (leitura.qualidade == "travada") {
+        return "falha";
+    }
+
+    if (leitura.nivelReservatorio < 24.0 ||
+        leitura.nivelReservatorio > 84.0 ||
+        leitura.pressaoLinha > 6.4) {
         return "alarme";
     }
 
@@ -22,7 +29,7 @@ void escreverLeiturasDoCiclo(EstacaoBombeamento& estacao, JsonWriter& writer) {
     const LeituraEstacao& leitura = estacao.getLeituraAtual();
     const std::vector<Alarme>& alarmes = estacao.getAlarmesAtivos();
     const std::vector<std::string>& comandos = estacao.getComandosRegistrados();
-    std::string status = statusSensor(leitura.nivelReservatorio, leitura.pressaoLinha);
+    std::string status = statusSensor(leitura);
 
     writer.escreverSensor("nivel_reservatorio", leitura.nivelReservatorio, "%", status, leitura.qualidade, alarmes, comandos);
     writer.escreverSensor("pressao_linha", leitura.pressaoLinha, "bar", status, "valida", alarmes, comandos);
@@ -69,30 +76,30 @@ int main() {
         comandos.push_back(std::make_unique<ComandoResetarAlarmes>());
         comandos.push_back(std::make_unique<ComandoAtivarManutencao>());
 
-        estacao.atualizarLeituras(20.0, 5.2, 18.0, 31.0);
+        std::vector<CicloSimulado> ciclos = criarCenariosSimulacaoEB84();
+        estacao.atualizarLeituras(ciclos[0].nivel, ciclos[0].pressao, ciclos[0].vazao, ciclos[0].temperatura);
         estacao.executarRegras(regras);
         comandos[0]->executar(estacao);
         escreverLeiturasDoCiclo(estacao, writer);
 
-        estacao.atualizarLeituras(86.0, 6.8, 16.0, 32.0);
+        estacao.atualizarLeituras(ciclos[1].nivel, ciclos[1].pressao, ciclos[1].vazao, ciclos[1].temperatura);
         estacao.executarRegras(regras);
         comandos[1]->executar(estacao);
         escreverLeiturasDoCiclo(estacao, writer);
 
-        estacao.atualizarLeituras(70.0, 6.9, 15.0, 33.0);
+        estacao.atualizarLeituras(ciclos[2].nivel, ciclos[2].pressao, ciclos[2].vazao, ciclos[2].temperatura);
         estacao.executarRegras(regras);
         comandos[2]->executar(estacao);
         escreverLeiturasDoCiclo(estacao, writer);
 
         estacao.simularFalhaSensorNivelTravado();
-        estacao.atualizarLeituras(65.0, 7.0, 14.0, 34.0);
+        estacao.atualizarLeituras(ciclos[3].nivel, ciclos[3].pressao, ciclos[3].vazao, ciclos[3].temperatura);
         estacao.executarRegras(regras);
         comandos[4]->executar(estacao);
         comandos[0]->executar(estacao);
         escreverLeiturasDoCiclo(estacao, writer);
 
-        estacao.registrarComando("sensor_nivel_travado");
-        writer.escreverEvento("alarme", "sensor_nivel_travado", 1, "evento", "executado", "travada", "", estacao.getAlarmesAtivos(), estacao.getComandosRegistrados());
+        writer.escreverEvento( "alarme", "sensor_nivel_travado", 1, "evento", "falha", "travada", "", estacao.getAlarmesAtivos(), estacao.getComandosRegistrados());
 
         imprimirResumo(estacao);
         std::cout << "Arquivo gerado: data/leituras_dispositivo.jsonl" << std::endl;
