@@ -5,15 +5,15 @@ from json_reader import carregar_jsonl
 from historico_repository import HistoricoRepository
 
 ESTACAO_ID = "EB-84"
-CAMINHO_JSONL = "data/leituras_exemplo.jsonl"
+CAMINHO_JSONL = "data/leituras_dispositivo.jsonl"
 CAMINHO_HISTORICO = "data/historico.csv"
-
-historico_repository = HistoricoRepository(CAMINHO_HISTORICO)
 
 st.set_page_config(
     page_title="Mini-SCADA EB-84",
     layout="wide"
 )
+
+historico_repository = HistoricoRepository(CAMINHO_HISTORICO)
 
 st.title("Mini-SCADA da Estação de Bombeamento — EB-84")
 
@@ -39,6 +39,8 @@ bombas = [
 df_leituras = pd.DataFrame(leituras)
 df_bombas = pd.DataFrame(bombas)
 
+historico = historico_repository.carregar_historico()
+
 st.subheader("Resumo operacional")
 
 col1, col2, col3 = st.columns(3)
@@ -55,6 +57,7 @@ with col2:
 with col3:
     st.metric("Registros válidos", len(registros_validos))
 
+
 st.subheader("Leituras atuais")
 
 if df_leituras.empty:
@@ -64,6 +67,7 @@ else:
         df_leituras,
         use_container_width=True
     )
+
 
 st.subheader("Estado das bombas")
 
@@ -75,49 +79,49 @@ else:
         use_container_width=True
     )
 
+
 st.subheader("Gráficos históricos")
 
-df_grafico = df_leituras.copy()
+if historico:
+    df_grafico = pd.DataFrame(historico)
 
-if df_grafico.empty:
-    st.info("Não há leituras suficientes para gerar gráficos.")
+    if "valor" in df_grafico.columns and "tag" in df_grafico.columns:
+        df_grafico["valor"] = pd.to_numeric(
+            df_grafico["valor"],
+            errors="coerce"
+        )
+
+        df_grafico = df_grafico.dropna(subset=["valor"])
+
+        dados_nivel = df_grafico[
+            df_grafico["tag"] == "nivel_reservatorio"
+        ].reset_index(drop=True)
+
+        dados_pressao = df_grafico[
+            df_grafico["tag"] == "pressao_linha"
+        ].reset_index(drop=True)
+
+        col_grafico1, col_grafico2 = st.columns(2)
+
+        with col_grafico1:
+            st.write("Nível do reservatório")
+
+            if dados_nivel.empty:
+                st.info("Não há dados de nível disponíveis.")
+            else:
+                st.line_chart(dados_nivel["valor"])
+
+        with col_grafico2:
+            st.write("Pressão da linha")
+
+            if dados_pressao.empty:
+                st.info("Não há dados de pressão disponíveis.")
+            else:
+                st.line_chart(dados_pressao["valor"])
+    else:
+        st.info("O histórico ainda não possui colunas suficientes para gerar gráficos.")
 else:
-    df_grafico["timestamp"] = pd.to_datetime(
-        df_grafico["timestamp"],
-        errors="coerce"
-    )
-
-    df_grafico["valor"] = pd.to_numeric(
-        df_grafico["valor"],
-        errors="coerce"
-    )
-
-    df_grafico = df_grafico.dropna(subset=["timestamp", "valor"])
-
-    grafico_dados = df_grafico.pivot_table(
-        index="timestamp",
-        columns="tag",
-        values="valor",
-        aggfunc="last"
-    ).sort_index()
-
-    col_grafico1, col_grafico2 = st.columns(2)
-
-    with col_grafico1:
-        st.write("Nível do reservatório")
-
-        if "nivel_reservatorio" in grafico_dados.columns:
-            st.line_chart(grafico_dados[["nivel_reservatorio"]])
-        else:
-            st.info("Não há dados de nível disponíveis.")
-
-    with col_grafico2:
-        st.write("Pressão da linha")
-
-        if "pressao_linha" in grafico_dados.columns:
-            st.line_chart(grafico_dados[["pressao_linha"]])
-        else:
-            st.info("Não há dados de pressão disponíveis.")
+    st.info("O histórico CSV ainda não possui registros para gerar gráficos.")
 
 
 st.subheader("Alarmes")
@@ -140,6 +144,7 @@ for registro in registros_validos:
 
 if alarmes_encontrados:
     df_alarmes = pd.DataFrame(alarmes_encontrados)
+    df_alarmes = df_alarmes.drop_duplicates()
 
     st.dataframe(
         df_alarmes,
@@ -176,6 +181,7 @@ for registro in registros_validos:
 
 if comandos_encontrados:
     df_comandos = pd.DataFrame(comandos_encontrados)
+    df_comandos = df_comandos.drop_duplicates()
 
     st.dataframe(
         df_comandos,
@@ -183,6 +189,7 @@ if comandos_encontrados:
     )
 else:
     st.info("Nenhum comando encontrado.")
+
 
 st.subheader("Validação do arquivo JSON Lines")
 
@@ -197,6 +204,7 @@ if registros_invalidos:
     )
 else:
     st.success("Todos os registros do arquivo JSON Lines são válidos.")
+
 
 st.subheader("Histórico CSV")
 

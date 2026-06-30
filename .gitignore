@@ -255,3 +255,6 @@ logs/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+echo "*.exe" >> .gitignore
+echo "mini_scada" >> .gitignore
