@@ -114,26 +114,39 @@ Ele contém:
 ```text
 poo-mini-scada-de-bombeamento-eb84/
 ├── dispositivo_cpp/
-│   ├── main.cpp
-│   ├── Bomba.h
+│   ├── Alarme.cpp
+│   ├── Alarme.h
 │   ├── Bomba.cpp
-│   ├── sensores.h
-│   ├── sensores.cpp
-│   ├── regras_controle.h
-│   └── regras_controle.cpp
+│   ├── Bomba.h
+│   ├── bombas.h
+│   ├── CenariosSimulacao.h
+│   ├── ComandoAtuacao.cpp
+│   ├── ComandoAtuacao.h
+│   ├── estacao.cpp
+│   ├── EstacaoBombeamento.cpp
+│   ├── EstacaoBombeamento.h
+│   ├── JsonWriter.cpp
+│   ├── JsonWriter.h
+│   ├── LeituraEstacao.h
+│   ├── main.cpp
+│   ├── ParametrosOperacionais.h
+│   ├── RegraControle.cpp
+│   ├── RegraControle.h
+│   └── sensor.cpp
 ├── supervisor_python/
 │   ├── app.py
+│   ├── historico_repository.py
 │   ├── json_reader.py
-│   ├── validator.py
-│   └── historico_repository.py
+│   └── validator.py
 ├── data/
-│   └── leituras_exemplo.jsonl
+│   └── leituras_dispositivo.jsonl
 ├── tests/
+│   ├── test_dispositivo_cpp.cpp
 │   └── test_supervisor_python.py
 ├── docs/
+│   └── contrato_json.md
 ├── README.md
 ├── AI_LOG.md
-├── contrato_json.md
 ├── requirements.txt
 └── .gitignore
 ```
@@ -473,64 +486,110 @@ Histórico CSV
 
 ---
 
-## Como executar o supervisor Python/Streamlit
+## Como executar o projeto no WSL/Ubuntu
 
-Instale as dependências:
+Os comandos abaixo devem ser executados a partir da raiz do projeto.
+
+### 1. Preparar o ambiente
+
+Instale os pacotes necessários no WSL:
 
 ```bash
-pip install -r requirements.txt
+sudo apt update
+sudo apt install python3-full python3-venv python3-pip g++ -y
 ```
 
-ou, caso o arquivo `requirements.txt` ainda não exista:
+Crie o ambiente virtual:
 
 ```bash
-pip install streamlit pandas pytest
+python3 -m venv ~/.venvs/scada-eb84
 ```
 
-Execute o supervisor a partir da raiz do projeto:
+Ative o ambiente virtual:
 
 ```bash
-py -m streamlit run supervisor_python/app.py
+source ~/.venvs/scada-eb84/bin/activate
 ```
 
-ou:
+Instale as dependências do supervisor:
 
 ```bash
-streamlit run supervisor_python/app.py
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
 ```
 
----
+No WSL/Ubuntu, o comando `python3` é usado para criar a venv. Depois da ativação, o comando `python` passa a usar o Python do ambiente virtual.
 
-## Como compilar o dispositivo C++
 
-Entre na pasta do dispositivo:
+### 2. Compilar o dispositivo C++
+
+Compile o dispositivo a partir da raiz do projeto:
 
 ```bash
-cd dispositivo_cpp
+g++ -std=c++17 dispositivo_cpp/*.cpp -o dispositivo_cpp/mini_scada
 ```
 
-Compile os arquivos C++:
+
+### 3. Executar o dispositivo C++
+
+Execute o simulador do dispositivo:
 
 ```bash
-g++ *.cpp -o mini_scada
+./dispositivo_cpp/mini_scada
 ```
 
-Execute no Windows:
+A execução gera o arquivo:
 
-```bash
-mini_scada.exe
+```text
+data/leituras_dispositivo.jsonl
 ```
 
-Execute no Linux/Mac:
+Esse arquivo contém as leituras, estados das bombas, alarmes e comandos gerados pelo dispositivo C++.
+
+Para conferir o conteúdo (Se quiser):
 
 ```bash
-./mini_scada
+head data/leituras_dispositivo.jsonl
 ```
 
-Caso o projeto esteja dividido em arquivos específicos, a compilação pode ser feita informando cada `.cpp`, por exemplo:
+
+### 4. Executar o supervisor Streamlit
+
+Com o ambiente virtual ativado, execute:
 
 ```bash
-g++ main.cpp Bomba.cpp sensores.cpp regras_controle.cpp -o mini_scada
+python -m streamlit run supervisor_python/app.py
+```
+
+O supervisor lê o arquivo:
+
+```text
+data/leituras_dispositivo.jsonl
+```
+
+e salva o histórico em:
+
+```text
+data/historico.csv
+```
+
+
+## Fluxo principal do sistema
+
+```text
+Dispositivo C++ -> data/leituras_dispositivo.jsonl -> Supervisor Streamlit -> data/historico.csv
+```
+
+
+## Execução resumida
+
+Depois que o ambiente já estiver preparado, execute:
+
+```bash
+source ~/.venvs/scada-eb84/bin/activate
+g++ -std=c++17 dispositivo_cpp/*.cpp -o dispositivo_cpp/mini_scada
+./dispositivo_cpp/mini_scada
+python -m streamlit run supervisor_python/app.py
 ```
 
 ---
@@ -539,19 +598,9 @@ g++ main.cpp Bomba.cpp sensores.cpp regras_controle.cpp -o mini_scada
 
 ### Testes Python
 
-Execute a partir da raiz do projeto:
+Os testes Python validam a leitura do arquivo JSON Lines e o contrato esperado pelo supervisor.
 
-```bash
-py -m pytest tests/
-```
-
-ou:
-
-```bash
-python -m pytest tests/
-```
-
-Os testes Python devem cobrir:
+Os testes cobrem:
 
 * JSON válido;
 * JSON sem campo obrigatório;
@@ -560,18 +609,49 @@ Os testes Python devem cobrir:
 * linha JSON corrompida;
 * leitura e validação do contrato JSON.
 
+Execute a partir da raiz do projeto, com o ambiente virtual ativado:
+
+```bash
+python -m pytest tests/
+```
+
+Resultado esperado:
+
+```text
+tests/test_supervisor_python.py ... passed
+```
+
 ### Testes C++
 
-Os testes C++ devem cobrir:
+O projeto possui testes simples para validar regras e comportamentos principais do dispositivo C++.
+
+Os testes cobrem:
 
 * regra de nível baixo;
 * regra de nível alto;
 * regra de pressão alta;
-* regra extra da dupla;
-* comandos bloqueados ou inválidos;
-* parâmetros específicos da EB-84.
+* regra extra da dupla: pressão alta persistente;
+* estados básicos da bomba;
+* bloqueio de comando inválido em bomba bloqueada;
+* parâmetros operacionais da EB-84.
 
-A forma exata de compilação dos testes C++ pode variar conforme os arquivos criados na pasta `tests/`.
+Para compilar os testes C++, execute a partir da raiz do projeto:
+
+```bash
+g++ -std=c++17 tests/test_dispositivo_cpp.cpp dispositivo_cpp/Bomba.cpp -o tests/test_dispositivo_cpp
+```
+
+Para executar:
+
+```bash
+./tests/test_dispositivo_cpp
+```
+
+Resultado esperado:
+
+```text
+Todos os testes do dispositivo C++ passaram.
+```
 
 ---
 
@@ -663,6 +743,8 @@ __pycache__/
 .pytest_cache/
 *.pyc
 data/historico.csv
+dispositivo_cpp/mini_scada
+dispositivo_cpp/mini_scada.exe
 ```
 
 O arquivo de exemplo abaixo deve ser mantido:
@@ -677,18 +759,18 @@ data/leituras_exemplo.jsonl
 
 Checklist final:
 
-* [ ] Dispositivo C++ compila.
-* [ ] C++ gera registros compatíveis com o contrato JSON.
-* [ ] Supervisor Streamlit executa.
-* [ ] Python lê JSON Lines.
-* [ ] Python valida campos obrigatórios.
-* [ ] Histórico CSV é salvo via Repository.
-* [ ] Gráficos históricos aparecem no Streamlit.
-* [ ] Alarmes aparecem no Streamlit.
-* [ ] Comandos aparecem no Streamlit.
-* [ ] Falha simulada aparece na demonstração.
-* [ ] Strategy aparece no C++.
-* [ ] Repository aparece no Python.
-* [ ] Testes foram executados.
-* [ ] README está atualizado.
-* [ ] AI_LOG está preenchido.
+* [x] Dispositivo C++ compila.
+* [x] C++ gera registros compatíveis com o contrato JSON.
+* [x] Supervisor Streamlit executa.
+* [x] Python lê JSON Lines.
+* [x] Python valida campos obrigatórios.
+* [x] Histórico CSV é salvo via Repository.
+* [x] Gráficos históricos aparecem no Streamlit.
+* [x] Alarmes aparecem no Streamlit.
+* [x] Comandos aparecem no Streamlit.
+* [x] Falha simulada aparece na demonstração.
+* [x] Strategy aparece no C++.
+* [x] Repository aparece no Python.
+* [x] Testes foram executados.
+* [x] README está atualizado.
+* [x] AI_LOG está preenchido.
