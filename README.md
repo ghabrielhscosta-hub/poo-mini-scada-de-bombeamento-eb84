@@ -118,7 +118,6 @@ poo-mini-scada-de-bombeamento-eb84/
 │   ├── Alarme.h
 │   ├── Bomba.cpp
 │   ├── Bomba.h
-│   ├── bombas.h
 │   ├── CenariosSimulacao.h
 │   ├── ComandoAtuacao.cpp
 │   ├── ComandoAtuacao.h
@@ -132,7 +131,6 @@ poo-mini-scada-de-bombeamento-eb84/
 │   ├── ParametrosOperacionais.h
 │   ├── RegraControle.cpp
 │   ├── RegraControle.h
-│   └── sensor.cpp
 ├── supervisor_python/
 │   ├── app.py
 │   ├── historico_repository.py
